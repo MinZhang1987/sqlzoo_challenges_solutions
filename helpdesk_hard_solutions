@@ -51,3 +51,36 @@ where @x < @counter
 ) t1;
 
 select  round((@sum20 / @sum ) * 100 , 4) as t20pc ;
+
+
+# 13
+# Annoying customers. Customers who call in the last five minutes of a shift are annoying. 
+# Find the most active customer who has never been annoying (and how many time they have called).
+
+select t3.company_name , count(call_ref) 
+from Issue t1 
+inner join Caller t2 
+on t1.caller_id=t2.caller_id  
+inner join Customer t3
+on t2.company_ref = t3.company_ref 
+where t3.company_name not in 
+(
+select s3.company_name   
+from (
+select time(call_date) a , caller_id 
+from Issue 
+where time(call_date) between '13:55:00' and '14:00:00' 
+or time(call_date) between '19:55:00' and '20:00:00' ) s1
+inner join Caller s2
+on s2.caller_id= s1.caller_id 
+inner join Customer s3
+on s3.company_ref= s2.company_ref
+)
+group by t3.company_name 
+order by count(call_ref) desc 
+limit 1;
+
+
+
+
+
