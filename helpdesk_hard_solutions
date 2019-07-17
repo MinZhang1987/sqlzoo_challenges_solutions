@@ -81,6 +81,49 @@ order by count(call_ref) desc
 limit 1;
 
 
+# 14
+# Maximal usage. If every caller registered with a customer makes a call in one day then that customer has "maximal usage" 
+# of the service. List the maximal customers for 2017-08-13.
+# NOTE: The original answer is wrong. See the explantion below
 
+select  t1.company_ref, t2.company_name,
+count(distinct t3.caller_id) caller_count, 
+count(distinct t3.call_ref) issue_count
+from Caller t1
+inner join Customer t2
+on t1.company_ref = t2.company_ref 
+inner join (
+select * from Issue
+where date(call_date) = '2017-08-13') t3
+on t3.caller_id = t1.caller_id
+where t1.company_ref not in (
+select  company_ref
+from Caller 
+where caller_id not in (
+select  caller_id 
+from Issue 
+where date(call_date) = '2017-08-13' )
+)
+group by t1.company_ref, t2.company_name
+order by t2.company_name
+;
+
+# Note: the answer provided on SQLZOO seems wrong to me.
+# The caller_id = 44 from 'Lady Retail'  and caller_id = 46 from 'High and Co.' called twice on '2017-08-13'.
+# The count of Issues should not be equal to the count of caller as the provided answer shows.
+# The question can be better worded as 'if every caller makes at least one call...'
+select call_date, call_ref , c2.company_name, i.caller_id
+from Issue i
+inner join Caller c
+on c.caller_id = i.caller_id
+inner join Customer c2
+on c2.company_ref = c.company_ref
+where date(call_date) = '2017-08-13'
+order by caller_id 
+;
+
+
+
+#15
 
 
