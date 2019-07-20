@@ -1,0 +1,34 @@
+# 1
+# Show the average daily temperature for August 10th 1964
+
+select m8/10 
+from hadcet 
+where dy=10 and yr = 1964 ;
+
+# 2
+# Charles Dickens is said to be responsible for the tradition of expecting snow at Christmas Daily Telegraph. 
+# Show the temperature on Christmas day (25th December) for each year of his childhood. He was born in February 1812 - 
+# so he was 1 (more or less) in December 1812.
+# Show the twelve temperatures.
+
+SELECT  yr-1811 as age , m12/10 temperature
+FROM hadcet
+WHERE yr BETWEEN 1812 and 1812+11 
+AND dy=25 ;
+
+
+# 3.
+# We declare a White Christmas if there was a day with an average temperature below zero between 21st and 25th of December.
+# For each age 1-12 show which years where a White Christmas.
+
+select max(yr-1811) as age,  
+max(case 
+when m12 < 0 then 'White'
+else ''
+end ) 
+from hadcet
+where yr between 1812 and 1812 + 11
+and dy between 21 and 25 
+group by yr; 
+
+ 
