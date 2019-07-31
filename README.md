@@ -1,1 +1,1 @@
-# sqlzoo_challenges
+# Solutions to the SQLZOO challenges. see https://sqlzoo.net/
