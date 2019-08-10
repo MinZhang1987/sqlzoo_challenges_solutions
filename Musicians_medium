@@ -1,0 +1,70 @@
+# NOTES:
+# The MUSICIANS ERD Data Model is unclear, which makes difficult to solve the challenges. 
+
+
+# 6. List the names, dates of birth and the instrument played of living musicians who play a instrument which Theo also plays.
+
+select distinct m.m_name , m.born  , p.instrument 
+from musician m
+left join performer p
+on p.perf_is= m.m_no 
+where p.instrument in (select performer.instrument from musician  
+left join performer 
+on performer.perf_is = musician.m_no  
+where musician.m_name like '%Theo%') 
+and m.died is null
+and m.m_name not like '%Theo%' ;
+
+
+
+# 7. List the name and the number of players for the band whose number of players is greater than the average
+# number of players in each band.
+select count(p.player)  , p.band_id, b.band_name
+from plays_in p
+left join band b
+on b.band_no = p.band_id
+group by p.band_id , b.band_name
+having count(p.player)  > (select avg(count) from 
+(select count(p2.player) count 
+from plays_in p2 group by p2.band_id ) x) ;
+
+
+# 8. List the names of musicians who both conduct and compose and live in Britain.
+select distinct m.m_no, m.m_name
+from musician m 
+inner join performance p
+on p.conducted_by = m.m_no 
+inner join composer c
+on c.comp_is = m.m_no 
+left join place p2
+on p2.place_no = m.living_in
+where p2.place_country = 'England' 
+or p2.place_country = 'Scotland' 
+;
+
+
+# 9.
+# Show the least commonly played instrument and the number of musicians who play it.
+
+select p.instrument, count(p.perf_is)
+from performer p
+group by p.instrument 
+having count(p.perf_is) = (
+select count(p2.perf_is) from performer p2
+group by p2.instrument
+order by count(p2.perf_is) 
+limit 1);
+
+# 10.
+# List the bands that have played music composed by Sue Little; Give the titles of the composition in each case.
+select distinct c.c_title  ,  b.band_name
+from has_composed h
+left join musician m
+on m.m_no = h.cmpr_no
+left join composition c
+on c.c_no = h.cmpn_no
+left join performance p
+on p.gave = h.cmpn_no
+left join band b
+on b.band_no = p.gave 
+where m.m_name = 'Sue Little';
